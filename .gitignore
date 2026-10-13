@@ -1,0 +1,7 @@
+/build/
+/devel/
+/artifacts/
+*.bag
+*.bag.partial
+*.hbs
+__pycache__/

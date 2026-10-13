@@ -1,0 +1,8 @@
+<launch>
+  <arg name="config" default="$(find omni_livo)/config/rig_hbs.yaml"/>
+  <arg name="output" default="/tmp/rig_results"/>
+  <arg name="use_sim_time" default="true"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+  <node pkg="omni_livo" type="rig_mapping" name="rig_mapping" output="screen"
+        args="--config $(arg config) --output $(arg output)"/>
+</launch>

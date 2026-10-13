@@ -1,0 +1,381 @@
+calibration_mode: validated
+sensors:
+  imus:
+  - id: 0
+    topic: /rig/imu/0/data_raw
+    rotation:
+    - 1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    gyro_noise: 0.02
+    accel_noise: 0.2
+    gyro_walk: 0.0001
+    accel_walk: 0.001
+  - id: 1
+    topic: /rig/imu/1/data_raw
+    rotation:
+    - 1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - -1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - -1.0
+    translation:
+    - 0.2
+    - 0.05
+    - 0.03
+    gyro_noise: 0.02
+    accel_noise: 0.2
+    gyro_walk: 0.0001
+    accel_walk: 0.001
+  lidars:
+  - id: 0
+    topic: /rig/lidar/0/points
+    rotation:
+    - 1.0
+    - -0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    translation:
+    - 0.1
+    - 0.0
+    - 0.0
+    max_points: 5000
+    blind: 0.5
+    range_noise: 0.03
+    beam_noise: 0.001
+  - id: 1
+    topic: /rig/lidar/1/points
+    rotation:
+    - 6.123233995736766e-17
+    - -1.0
+    - 0.0
+    - 1.0
+    - 6.123233995736766e-17
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    translation:
+    - 6.123233995736766e-18
+    - 0.1
+    - 0.0
+    max_points: 5000
+    blind: 0.5
+    range_noise: 0.03
+    beam_noise: 0.001
+  - id: 2
+    topic: /rig/lidar/2/points
+    rotation:
+    - -1.0
+    - -1.2246467991473532e-16
+    - 0.0
+    - 1.2246467991473532e-16
+    - -1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    translation:
+    - -0.1
+    - 1.2246467991473533e-17
+    - 0.0
+    max_points: 5000
+    blind: 0.5
+    range_noise: 0.03
+    beam_noise: 0.001
+  - id: 3
+    topic: /rig/lidar/3/points
+    rotation:
+    - -1.8369701987210297e-16
+    - 1.0
+    - 0.0
+    - -1.0
+    - -1.8369701987210297e-16
+    - 0.0
+    - 0.0
+    - 0.0
+    - 1.0
+    translation:
+    - -1.8369701987210297e-17
+    - -0.1
+    - 0.0
+    max_points: 5000
+    blind: 0.5
+    range_noise: 0.03
+    beam_noise: 0.001
+  cameras:
+  - id: 0
+    topic: /rig/camera/0/image_raw
+    rotation:
+    - 0.0
+    - 0.0
+    - 1.0
+    - -1.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 1
+    topic: /rig/camera/1/image_raw
+    rotation:
+    - 0.7071067811865475
+    - 0.0
+    - 0.7071067811865476
+    - -0.7071067811865476
+    - 0.0
+    - 0.7071067811865475
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 2
+    topic: /rig/camera/2/image_raw
+    rotation:
+    - 1.0
+    - 0.0
+    - 6.123233995736766e-17
+    - -6.123233995736766e-17
+    - 0.0
+    - 1.0
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 3
+    topic: /rig/camera/3/image_raw
+    rotation:
+    - 0.7071067811865476
+    - 0.0
+    - -0.7071067811865475
+    - 0.7071067811865475
+    - 0.0
+    - 0.7071067811865476
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 4
+    topic: /rig/camera/4/image_raw
+    rotation:
+    - 1.2246467991473532e-16
+    - 0.0
+    - -1.0
+    - 1.0
+    - 0.0
+    - 1.2246467991473532e-16
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 5
+    topic: /rig/camera/5/image_raw
+    rotation:
+    - -0.7071067811865475
+    - 0.0
+    - -0.7071067811865477
+    - 0.7071067811865477
+    - 0.0
+    - -0.7071067811865475
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 6
+    topic: /rig/camera/6/image_raw
+    rotation:
+    - -1.0
+    - 0.0
+    - -1.8369701987210297e-16
+    - 1.8369701987210297e-16
+    - 0.0
+    - -1.0
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+  - id: 7
+    topic: /rig/camera/7/image_raw
+    rotation:
+    - -0.7071067811865477
+    - 0.0
+    - 0.7071067811865474
+    - -0.7071067811865474
+    - 0.0
+    - -0.7071067811865477
+    - 0.0
+    - -1.0
+    - 0.0
+    translation:
+    - 0.0
+    - 0.0
+    - 0.0
+    model: pinhole
+    width: 160
+    height: 120
+    scale: 1.0
+    fx: 80.0
+    fy: 80.0
+    cx: 80.0
+    cy: 60.0
+    distortion:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+processing:
+  threads: 4
+  max_match_points: 20000
+  visual_points: 800
+  camera_min: 50
+  camera_max: 150
+  patch_size: 8
+  iterations: 3
+  max_voxels: 40000
+  max_visual_points: 3000
+  update_period: 0.1
+  wait_budget: 0.15
+  sensor_timeout: 0.3
+  init_duration: 0.2
+  voxel_size: 1.0
+  map_radius: 50.0
+  photo_variance: 100.0
+  photo_gate: 40.0
+  rigid_rotation_noise: 0.01
+  rigid_position_noise: 0.02
+  geometry: true
+  visual: true
+  uncertainty: true
+  cross_camera: true
