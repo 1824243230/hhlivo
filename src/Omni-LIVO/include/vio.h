@@ -26,7 +26,7 @@
  * Odometry via Photometric Migration and ESIKF Fusion," IEEE Robotics and Automation
  * Letters, 2026.
  */
-
+###修改了
 #ifndef VIO_H_
 #define VIO_H_
 
