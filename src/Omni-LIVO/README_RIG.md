@@ -20,25 +20,48 @@ bash src/Omni-LIVO/scripts/build_rig.sh
 
 ## 转换和回放当前 HBS
 
+在工作区根目录执行。转换器始终将所选时间范围内的全部传感器消息写入 **一个 bag 文件**，不按大小生成 `rig_001.bag` 等分段，原来的 `--split-gb` 参数已移除。不指定 `--start`、`--duration` 时转换完整 HBS。
+
+### 1. 转换为单个 bag
+
 ```bash
 /usr/bin/python3 src/Omni-LIVO/scripts/hbs_multi.py \
-  hbus_0007_20260917111850371LLmineLLliudongLL22.04_bak.hbs \
-  --output artifacts/hbs/rig.bag --split-gb 2
+  hbus_0002_20260917111501752LLmineLLliudongLL22.04_bak.hbs \
+  --output artifacts/hbs/rig.bag
+```
 
+成功后生成 `artifacts/hbs/rig.bag` 和 `artifacts/hbs/rig.report.json`。报告的 `status` 应为 `complete`，`output_bags` 仅包含这个 bag。转换过程中先写入 `rig.bag.partial`，全部消息写入并关闭后才改名为 `rig.bag`；失败时查看报告中的 `error`，未完成的 `.partial` 不能作为完整转换结果使用。
+
+输出 bag、报告或 `.partial` 已存在时，程序拒绝覆盖，请选择新的文件名或目录。旧版本生成的分段不会自动合并或删除；按上述命令从源 HBS 重新转换，并仅使用新的单个 bag。
+
+8 路相机解码会生成临时 BGR 图像，解码后的数据通常远大于压缩 HBS。请为临时图像和完整 bag 留出足够磁盘空间；可用 `--temp-dir /有足够空间的目录` 指定临时目录，默认由系统选择，转换结束后自动清理。`--compression` 默认 `lz4`，也可选 `none` 或 `bz2`；压缩方式不改变单文件输出。
+
+### 2. 校验 bag
+
+```bash
 /usr/bin/python3 src/Omni-LIVO/scripts/verify_rig_bag.py \
-  artifacts/hbs/*.bag --output artifacts/hbs/validation.json
+  artifacts/hbs/rig.bag \
+  --output artifacts/hbs/validation.json
+```
 
+校验通过时，`validation.json` 的 `status` 为 `passed`，包含 14 路传感器的消息数量、图像尺寸及雷达点数，并检查消息字段与时间顺序。
+
+本次验证（2026-10-14）：上述 `hbus_0002_20260917111501752LLmineLLliudongLL22.04_bak.hbs` 已转换为唯一的 `artifacts/hbs/rig.bag`，大小约 15.98 GiB，14 路传感器共 14,118 条消息，全量读回校验通过。相机有 45 个时间戳未解码出图像，解码器报告部分 H.265 数据无效；各实例的具体时间戳和错误原因保存在 `rig.report.json` 的 `cameras` 字段中。
+
+### 3. 离线定位并检查结果
+
+```bash
 build/omni/devel/lib/omni_livo/rig_mapping \
   --config src/Omni-LIVO/config/rig_hbs.yaml \
-  --bag artifacts/hbs/*.bag --output artifacts/hbs/run
+  --bag artifacts/hbs/rig.bag --output artifacts/hbs/run
 
 /usr/bin/python3 src/Omni-LIVO/scripts/verify_rig_run.py \
   artifacts/hbs/run --conversion-report artifacts/hbs/rig.report.json --require-all
 ```
 
-以上路径已经存在时，请选择新的输出目录/文件名。程序不覆盖已有结果。
+定位输出目录已经存在时，请选择新的输出目录。程序不覆盖已有结果。
 
-当前 HBS 已转换到 `artifacts/hbs/rig.bag` 和 `rig_001.bag`～`rig_009.bag`。转换按相机实例保持独立 H.265 解码器，记录原始 PTS；采用磁盘中间文件，内存不会随所有解码图像增长。`--start`、`--duration` 可截取，但仍从前面的编码帧建立解码参考。
+转换按相机实例保持独立 H.265 解码器，记录原始 PTS；采用磁盘中间文件，内存不会随所有解码图像增长。`--start`、`--duration` 可截取，但仍从前面的编码帧建立解码参考。即使截取也只生成一个 bag；若所选区间没有可输出的消息，转换失败并在报告中说明原因。
 
 输出是标准化的 14 路 ROS 消息：
 
@@ -75,22 +98,41 @@ C++/Python 单元测试：
 (cd build/omni && ctest --output-on-failure)
 ```
 
-## ROS 在线入口
+仅验证 HBS 转换器，无需构建 C++：
 
 ```bash
+/usr/bin/python3 -m unittest discover \
+  -s src/Omni-LIVO/tests -p test_hbs_multi.py -v
+```
+
+覆盖单文件写入与 14 路消息读回、超过旧 2 GiB 阈值仍不分包、已有输出保护、失败时保留临时 bag，以及空时间区间报错。
+
+## ROS 在线入口
+
+在工作区根目录执行；首次使用或修改 C++ 后先运行 `bash src/Omni-LIVO/scripts/build_rig.sh`：
+
+```bash
+cd ~/hyhLIOV
 source /opt/ros/noetic/setup.bash
 source build/omni/devel/setup.bash
 roslaunch omni_livo mapping_rig.launch output:=/tmp/rig_live_new
 ```
 
-另一个终端回放：
+该命令默认同时打开 RViz，加载 `rviz_cfg/rig.rviz`，固定坐标系为 `rig_world`。默认显示按高度着色的局部地图、黄色连续轨迹、机体姿态坐标轴和相机 0 图像。左侧 `Other Cameras` 可勾选相机 1～7；`Raw LiDAR (optional)` 可勾选四路原始点云；`Sensor Frames (optional)` 可显示传感器坐标系。原始点云为未去畸变的传感器输入，定位地图显示在 `Local Map` 中。`Views` 的 `Follow Rig` 可切换为跟随机体的视角。
+
+RViz 打开后需要传感器数据才能显示地图和轨迹。另一个终端从工作区根目录回放：
 
 ```bash
+cd ~/hyhLIOV
 source /opt/ros/noetic/setup.bash
-rosbag play --clock --rate 0.2 artifacts/hbs/*.bag
+rosbag play --clock --rate 0.2 artifacts/hbs/rig.bag
 ```
 
-先采用较低回放速度验证链路。`use_sim_time:=false` 用于实际驱动输入。在线输出 `/rig/odometry`、`/rig/local_map` 和 `/rig/diagnostics`；离线入口不依赖 roscore，并将输出写入 bag。
+回放仅传入新的单个 `rig.bag`，先采用较低回放速度验证链路。启动后、回放前没有 `/clock` 和估计结果时，RViz 暂时提示无数据/无坐标系属于正常等待状态。输出目录已有结果时，请换一个新目录。
+
+`use_sim_time:=false` 用于实际驱动输入。无需 GUI 时加 `rviz:=false`；自定义 RViz 配置时加 `rviz_config:=/绝对路径/custom.rviz`。在线输出 `/rig/odometry`、`/rig/local_map`、`/rig/path` 和 `/rig/diagnostics`，并发布 `rig_world → rig_body` 动态 TF，以及由配置中的 `T_B_sensor` 外参生成的 `rig_body → imu_N/lidar_N/camera_N` 静态 TF。轨迹可视化保留最近 2000 个位姿，完整轨迹仍保存于 `trajectory.txt`；数据时钟回跳重新初始化时清空显示轨迹和地图。示例配置的外参仍是占位值，原始点云显示也使用这些值。
+
+离线入口不依赖 roscore，并将输出写入 bag。
 
 隔离本地 ROS master 的传输测试：
 

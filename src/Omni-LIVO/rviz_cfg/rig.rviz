@@ -1,0 +1,341 @@
+Panels:
+- Class: rviz/Displays
+  Name: Displays
+  Property Tree Widget:
+    Expanded:
+    - /Global Options1
+    Splitter Ratio: 0.5
+- Class: rviz/Views
+  Name: Views
+- Class: rviz/Time
+  Name: Time
+  SyncMode: 0
+  SyncSource: ''
+Preferences:
+  PromptSaveOnExit: false
+Visualization Manager:
+  Class: ''
+  Name: root
+  Enabled: true
+  Value: true
+  Global Options:
+    Fixed Frame: rig_world
+    Background Color: 24; 28; 36
+    Frame Rate: 20
+  Displays:
+  - Class: rviz/Grid
+    Name: Grid
+    Enabled: true
+    Value: true
+    Cell Size: 1
+    Plane Cell Count: 40
+    Color: 70; 80; 90
+    Alpha: 0.35
+    Reference Frame: <Fixed Frame>
+  - Class: rviz/PointCloud2
+    Name: Local Map
+    Enabled: true
+    Value: true
+    Topic: /rig/local_map
+    Queue Size: 2
+    Style: Points
+    Size (Pixels): 2
+    Size (m): 0.03
+    Alpha: 1
+    Position Transformer: XYZ
+    Color Transformer: AxisColor
+    Axis: Z
+    Autocompute Value Bounds:
+      Value: true
+    Decay Time: 0
+    Use Fixed Frame: true
+    Selectable: true
+    Unreliable: false
+    Use rainbow: true
+  - Class: rviz/Path
+    Name: Trajectory
+    Enabled: true
+    Value: true
+    Topic: /rig/path
+    Queue Size: 1
+    Buffer Length: 1
+    Line Style: Billboards
+    Line Width: 0.05
+    Color: 255; 200; 60
+    Alpha: 1
+    Pose Style: None
+  - Class: rviz/Odometry
+    Name: Body Pose
+    Enabled: true
+    Value: true
+    Topic: /rig/odometry
+    Queue Size: 10
+    Keep: 1
+    Position Tolerance: 0
+    Angle Tolerance: 0
+    Shape:
+      Value: Axes
+      Axes Length: 1
+      Axes Radius: 0.04
+      Alpha: 1
+    Covariance:
+      Value: false
+  - Class: rviz/TF
+    Name: Sensor Frames (optional)
+    Enabled: false
+    Value: false
+    Show Names: true
+    Show Axes: true
+    Show Arrows: true
+    Marker Scale: 0.5
+    Frame Timeout: 15
+    Frames:
+      All Enabled: true
+  - Class: rviz/Image
+    Name: Camera 0
+    Enabled: true
+    Value: true
+    Image Topic: /rig/camera/0/image_raw
+    Transport Hint: raw
+    Queue Size: 1
+    Normalize Range: true
+    Min Value: 0
+    Max Value: 1
+    Median window: 5
+    Unreliable: false
+  - Class: rviz/Group
+    Name: Other Cameras
+    Enabled: true
+    Displays:
+    - Class: rviz/Image
+      Name: Camera 1
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/1/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 2
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/2/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 3
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/3/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 4
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/4/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 5
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/5/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 6
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/6/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+    - Class: rviz/Image
+      Name: Camera 7
+      Enabled: false
+      Value: false
+      Image Topic: /rig/camera/7/image_raw
+      Transport Hint: raw
+      Queue Size: 1
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Unreliable: false
+  - Class: rviz/Group
+    Name: Raw LiDAR (optional)
+    Enabled: true
+    Displays:
+    - Class: rviz/PointCloud2
+      Name: LiDAR 0
+      Enabled: false
+      Value: false
+      Topic: /rig/lidar/0/points
+      Queue Size: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Alpha: 1
+      Position Transformer: XYZ
+      Color Transformer: FlatColor
+      Axis: Z
+      Autocompute Value Bounds:
+        Value: true
+      Decay Time: 0
+      Use Fixed Frame: true
+      Selectable: true
+      Unreliable: false
+      Use rainbow: true
+      Color: 255; 100; 100
+    - Class: rviz/PointCloud2
+      Name: LiDAR 1
+      Enabled: false
+      Value: false
+      Topic: /rig/lidar/1/points
+      Queue Size: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Alpha: 1
+      Position Transformer: XYZ
+      Color Transformer: FlatColor
+      Axis: Z
+      Autocompute Value Bounds:
+        Value: true
+      Decay Time: 0
+      Use Fixed Frame: true
+      Selectable: true
+      Unreliable: false
+      Use rainbow: true
+      Color: 100; 255; 140
+    - Class: rviz/PointCloud2
+      Name: LiDAR 2
+      Enabled: false
+      Value: false
+      Topic: /rig/lidar/2/points
+      Queue Size: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Alpha: 1
+      Position Transformer: XYZ
+      Color Transformer: FlatColor
+      Axis: Z
+      Autocompute Value Bounds:
+        Value: true
+      Decay Time: 0
+      Use Fixed Frame: true
+      Selectable: true
+      Unreliable: false
+      Use rainbow: true
+      Color: 100; 160; 255
+    - Class: rviz/PointCloud2
+      Name: LiDAR 3
+      Enabled: false
+      Value: false
+      Topic: /rig/lidar/3/points
+      Queue Size: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Alpha: 1
+      Position Transformer: XYZ
+      Color Transformer: FlatColor
+      Axis: Z
+      Autocompute Value Bounds:
+        Value: true
+      Decay Time: 0
+      Use Fixed Frame: true
+      Selectable: true
+      Unreliable: false
+      Use rainbow: true
+      Color: 220; 120; 255
+  Tools:
+  - Class: rviz/Interact
+  - Class: rviz/MoveCamera
+  - Class: rviz/Select
+  - Class: rviz/FocusCamera
+  - Class: rviz/Measure
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Name: Current View
+      Target Frame: <Fixed Frame>
+      Distance: 30
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Pitch: 0.7
+      Yaw: 0.8
+      Near Clip Distance: 0.01
+    Saved:
+    - Class: rviz/ThirdPersonFollower
+      Name: Follow Rig
+      Target Frame: rig_body
+      Distance: 15
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Pitch: 0.7
+      Yaw: 0.8
+Window Geometry:
+  Camera 0:
+    collapsed: false
+  Camera 1:
+    collapsed: true
+  Camera 2:
+    collapsed: true
+  Camera 3:
+    collapsed: true
+  Camera 4:
+    collapsed: true
+  Camera 5:
+    collapsed: true
+  Camera 6:
+    collapsed: true
+  Camera 7:
+    collapsed: true
+  Displays:
+    collapsed: false
+  Height: 900
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd000000030000000000000156000002ebfc0200000001fb000000100044006900730070006c006100790073010000003d000002eb000000c900ffffff0000000100000140000002ebfc0200000002fc0000003d000001730000001600fffffffa000000000200000008fb0000001000430061006d006500720061002000300100000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000310000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000320000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000330000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000340000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000350000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000360000000000ffffffff0000001600fffffffb0000001000430061006d006500720061002000370000000000ffffffff0000001600fffffffb0000000a0056006900650077007301000001b600000172000000a400ffffff00000003000005a000000039fc0100000001fb0000000800540069006d00650100000000000005a0000003bc00ffffff000002fe000002eb00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Time:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1440
+  X: 72
+  Y: 40

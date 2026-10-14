@@ -4,9 +4,13 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <rosbag/bag.h>
 #include <fstream>
 #include <mutex>
+#include <memory>
 namespace rig {
   struct LidarPacket {
     int id=0;
@@ -42,7 +46,10 @@ namespace rig {
     std::string output_;
     std::ofstream trajectory_file_,diagnostics_file_;
     rosbag::Bag output_bag_;
-    ros::Publisher odom_pub_,cloud_pub_,diagnostics_pub_;
+    ros::Publisher odom_pub_,cloud_pub_,diagnostics_pub_,path_pub_;
+    nav_msgs::Path display_path_;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    std::unique_ptr<tf2_ros::StaticTransformBroadcaster> static_tf_broadcaster_;
     std::mutex mutex_;
     double time(uint64_t stamp,double offset=0);
     const ImuConfig& imuConfig(int id) const;

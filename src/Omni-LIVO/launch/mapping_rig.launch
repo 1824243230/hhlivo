@@ -2,7 +2,11 @@
   <arg name="config" default="$(find omni_livo)/config/rig_hbs.yaml"/>
   <arg name="output" default="/tmp/rig_results"/>
   <arg name="use_sim_time" default="true"/>
+  <arg name="rviz" default="true"/>
+  <arg name="rviz_config" default="$(find omni_livo)/rviz_cfg/rig.rviz"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
   <node pkg="omni_livo" type="rig_mapping" name="rig_mapping" output="screen"
         args="--config $(arg config) --output $(arg output)"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rig_rviz" output="screen"
+        args="-d $(arg rviz_config)"/>
 </launch>

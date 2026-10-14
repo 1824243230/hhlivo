@@ -93,6 +93,7 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         pcl_ros
         tf
+        tf2_ros
         livox_ros_driver
         message_generation
         eigen_conversions
@@ -188,4 +189,4 @@ install(TARGETS rig_mapping rig_core rig_frontend fastlivo_mapping lio vio pre i
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
-install(DIRECTORY config launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY config launch rviz_cfg DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

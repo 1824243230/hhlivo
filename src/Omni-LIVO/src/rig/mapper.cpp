@@ -55,6 +55,34 @@ namespace rig {
     odom_pub_=nh.advertise<nav_msgs::Odometry>("/rig/odometry",10);
     cloud_pub_=nh.advertise<sensor_msgs::PointCloud2>("/rig/local_map",1,true);
     diagnostics_pub_=nh.advertise<std_msgs::String>("/rig/diagnostics",10);
+    path_pub_=nh.advertise<nav_msgs::Path>("/rig/path",1,true);
+    display_path_.header.frame_id="rig_world";
+    // Construct ROS broadcasters only after ros::init, in the online entry point.
+    tf_broadcaster_=std::make_unique<tf2_ros::TransformBroadcaster>();
+    static_tf_broadcaster_=std::make_unique<tf2_ros::StaticTransformBroadcaster>();
+    std::vector<geometry_msgs::TransformStamped> transforms;
+    const auto append=[&](const auto& sensors,const std::string& kind){
+      for(const auto& c:sensors)if(c.enabled){
+        geometry_msgs::TransformStamped transform;
+        transform.header.stamp=ros::Time::now();
+        transform.header.frame_id="rig_body";
+        transform.child_frame_id=kind+"_"+std::to_string(c.id);
+        transform.transform.translation.x=c.extrinsic.p.x();
+        transform.transform.translation.y=c.extrinsic.p.y();
+        transform.transform.translation.z=c.extrinsic.p.z();
+        Eigen::Quaterniond rotation(c.extrinsic.R);
+        rotation.normalize();
+        transform.transform.rotation.x=rotation.x();
+        transform.transform.rotation.y=rotation.y();
+        transform.transform.rotation.z=rotation.z();
+        transform.transform.rotation.w=rotation.w();
+        transforms.push_back(transform);
+      }
+    };
+    append(config_.imus,"imu");
+    append(config_.lidars,"lidar");
+    append(config_.cameras,"camera");
+    static_tf_broadcaster_->sendTransform(transforms);
   }
   double RigMapper::time(uint64_t stamp,double offset) {
     if(!origin_)origin_=stamp;
@@ -423,7 +451,25 @@ namespace rig {
     Mat6 twist=filter_.bodyTwistCovariance();
     for(int i=0; i<6; ++i)for(int j=0; j<6; ++j)odom.twist.covariance[i*6+j]=twist(i,j);
     output_bag_.write("/rig/odometry",odom.header.stamp,odom);
-    if(online_&&ros::ok())odom_pub_.publish(odom);
+    if(online_&&ros::ok()){
+      odom_pub_.publish(odom);
+      geometry_msgs::TransformStamped transform;
+      transform.header=odom.header;
+      transform.child_frame_id=odom.child_frame_id;
+      transform.transform.translation.x=b.p.x();
+      transform.transform.translation.y=b.p.y();
+      transform.transform.translation.z=b.p.z();
+      transform.transform.rotation=odom.pose.pose.orientation;
+      tf_broadcaster_->sendTransform(transform);
+      geometry_msgs::PoseStamped pose;
+      pose.header=odom.header;
+      pose.pose=odom.pose.pose;
+      display_path_.header=odom.header;
+      // Keep visualization memory and publication bandwidth bounded on long runs.
+      if(display_path_.poses.size()>=2000)display_path_.poses.erase(display_path_.poses.begin());
+      display_path_.poses.push_back(pose);
+      path_pub_.publish(display_path_);
+    }
     diagnostics_file_ << std::setprecision(9)
     << batch.time
     << ","
@@ -445,7 +491,7 @@ namespace rig {
     << "\n";
     total_compute_+=computation;
     max_compute_=std::max(max_compute_,computation);
-    if(online_&&ros::ok()&&updates_%10==0){
+    if(online_&&ros::ok()&&(updates_%10==0||display_path_.poses.size()==1)){
       cloud_pub_.publish(cloud(geometry_.mapPoints(),ns));
       std_msgs::String s;
       s.data="tracking; state_dimension="+std::to_string(filter_.state.layout.size());
@@ -559,6 +605,12 @@ namespace rig {
     geometry_.clear();
     visual_.clear();
     trajectory_.clear();
+    display_path_.poses.clear();
+    if(online_&&ros::ok()){
+      display_path_.header.stamp=ros::Time::now();
+      path_pub_.publish(display_path_);
+      cloud_pub_.publish(cloud({},display_path_.header.stamp.toNSec()));
+    }
     imus_.clear();
     lidars_.clear();
     cameras_.clear();

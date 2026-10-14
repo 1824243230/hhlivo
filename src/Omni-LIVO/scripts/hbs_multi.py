@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stream all HBS sensor instances to normalized, availability-ordered ROS1 bags."""
+"""Stream all HBS sensor instances to one normalized, availability-ordered ROS1 bag."""
 import argparse
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -186,7 +186,8 @@ def convert(args):
         'gyro_source_units':[args.imu0_gyro_unit,args.imu1_gyro_unit], 'calibration':'not applied'}
     report_path=output.with_suffix('.report.json');output.parent.mkdir(parents=True,exist_ok=True)
     if output.exists() or report_path.exists():raise FileExistsError('choose a new output path; existing data is never overwritten')
-    files=[];bags=[];bag=None
+    partial=Path(str(output)+'.partial');bag=None
+    if partial.exists():raise FileExistsError(f'unfinished output already exists: {partial}; choose a new output path')
     try:
         entries,cameras=index(args.input,report);origin=min([e.stamp for e in entries]+[s for g in cameras.values() for s in g]);begin=origin+int(args.start*1e9);end=None if args.duration is None else begin+int(args.duration*1e9)
         entries=[e for e in entries if e.stamp>=begin and (end is None or e.stamp<end)]
@@ -197,29 +198,26 @@ def convert(args):
                 report['cameras']={}
                 for id,future in futures.items():
                     decoded,stats=future.result();entries.extend(decoded);report['cameras'][str(id)]=stats;print(f'Camera {id}: {len(decoded)} frames',flush=True)
-            counts=Counter();ranges={};part=0;part_bytes=0
+            counts=Counter();ranges={}
+            if not entries:raise FormatError('no sensor messages in the selected interval')
+            bag=rosbag.Bag(str(partial),'w',compression=args.compression)
             with open(args.input,'rb') as source:
                 spools={id:open(Path(temp)/f'camera_{id}.bgr','rb') for id in cameras}
                 try:
                     for e in sorted(entries,key=lambda e:(e.available,0 if e.kind=='imu' else 1 if e.kind=='lidar' else 2,e.id,e.offset)):
-                        if bag is None or (part_bytes>=args.split_gb*1024**3 and args.split_gb>0):
-                            if bag is not None:bag.close();bag=None;files[-1].rename(bags[-1])
-                            name=output if part==0 else output.with_name(f'{output.stem}_{part:03d}{output.suffix}');partial=Path(str(name)+'.partial')
-                            if name.exists() or partial.exists():raise FileExistsError(name)
-                            files.append(partial);bags.append(name);bag=rosbag.Bag(str(partial),'w',compression=args.compression);part+=1;part_bytes=0
                         fd=spools[e.id] if e.kind=='camera' else source;fd.seek(e.offset);p=read_exact(fd,e.length,'indexed payload');key=f'{e.kind}/{e.id}';seq=counts[key]
                         if e.kind=='camera':msg=Image(header=Header(seq=seq,stamp=ros_time(e.stamp),frame_id=f'camera_{e.id}'),height=e.height,width=e.width,encoding='bgr8',is_bigendian=False,step=e.width*3,data=p);topic=f'/rig/camera/{e.id}/image_raw'
                         elif e.kind=='imu':msg=imu_message(p,e.stamp,e.id,seq,report['gyro_source_units']);topic=f'/rig/imu/{e.id}/data_raw'
                         else:
                             h,points,times=lidar_payload(p,e.id);xyz=np.column_stack([points[k] for k in ('x','y','z')]).astype(np.float32)*0.01
                             msg=normalized_cloud(xyz,points['ref'],times-e.stamp,points['ring'],e.stamp,e.id,seq);topic=f'/rig/lidar/{e.id}/points'
-                        bag.write(topic,msg,ros_time(e.available));counts[key]+=1;part_bytes+=len(msg.data) if hasattr(msg,'data') else 256
+                        bag.write(topic,msg,ros_time(e.available));counts[key]+=1
                         if key not in ranges:ranges[key]=[e.stamp,e.stamp]
                         ranges[key][1]=e.stamp
                 finally:
                     for fd in spools.values():fd.close()
-            if bag is not None:bag.close();bag=None;files[-1].rename(bags[-1])
-            report.update(status='complete',output_bags=[str(p.resolve()) for p in bags],output_counts=dict(counts),output_ranges_ns=ranges)
+            bag.close();bag=None;partial.rename(output)
+            report.update(status='complete',output_bags=[str(output.resolve())],output_counts=dict(counts),output_ranges_ns=ranges)
     except Exception as exc:
         report.update(status='failed',error=str(exc));raise
     finally:
@@ -230,9 +228,9 @@ def convert(args):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('input');p.add_argument('-o','--output',required=True)
     p.add_argument('--start',type=float,default=0);p.add_argument('--duration',type=float);p.add_argument('--workers',type=int,default=2)
-    p.add_argument('--split-gb',type=float,default=2);p.add_argument('--temp-dir');p.add_argument('--compression',choices=['lz4','none','bz2'],default='lz4')
+    p.add_argument('--temp-dir');p.add_argument('--compression',choices=['lz4','none','bz2'],default='lz4')
     for id in (0,1):p.add_argument(f'--imu{id}-gyro-unit',choices=['deg/s','rad/s'],default='deg/s')
     args=p.parse_args()
-    if args.start<0 or (args.duration is not None and args.duration<=0) or not 1<=args.workers<=8 or args.split_gb<0:p.error('invalid interval/workers/split size')
+    if args.start<0 or (args.duration is not None and args.duration<=0) or not 1<=args.workers<=8:p.error('invalid interval/workers')
     convert(args)
 if __name__=='__main__':main()
